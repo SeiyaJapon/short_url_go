@@ -9,19 +9,19 @@ import (
 	"log"
 )
 
-type DynamoRepo struct {
+type DynamoShorterRepository struct {
 	db *dynamodb.DynamoDB
 }
 
-func NewDynamoRepo() *DynamoRepo {
+func DynamoShorterRepositoryConstruct() *DynamoShorterRepository {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String("eu-west-2"),
 	}))
 	db := dynamodb.New(sess)
-	return &DynamoRepo{db: db}
+	return &DynamoShorterRepository{db: db}
 }
 
-func (repo *DynamoRepo) Shorten(url *domain.URL) (string, error) {
+func (repo *DynamoShorterRepository) Shorten(url *domain.URL) (string, error) {
 	shortURL := generateShortURL(url.Id)
 	err := repo.SaveURLMapping(url.String(), shortURL)
 	if err != nil {
@@ -30,7 +30,7 @@ func (repo *DynamoRepo) Shorten(url *domain.URL) (string, error) {
 	return shortURL, nil
 }
 
-func (repo *DynamoRepo) SaveURLMapping(originalURL, shortURL string) error {
+func (repo *DynamoShorterRepository) SaveURLMapping(originalURL, shortURL string) error {
 	item := domain.URLMapping{
 		OriginalURL: originalURL,
 		ShortURL:    shortURL,

@@ -9,10 +9,14 @@ import (
 )
 
 func main() {
-	var urlRepo interfaces.URLShorter = persistence.NewDynamoRepo()
-	var urlShortenerUseCase = *application.NewURLShortenerUseCase(urlRepo)
+	var urlShorterRepository interfaces.URLShorter = persistence.DynamoShorterRepositoryConstruct()
+	var urlRedirecterRepository interfaces.URLRedirecter = '' // TODO: Implement the repository
+	var urlShortenerUseCase = *application.NewURLShortenerUseCase(urlShorterRepository)
+	var urlRedirecter = *application.NewRedirectHandlerUseCase(urlRedirecterRepository)
 
-	handler := customHttp.NewHandler(urlShortenerUseCase)
+	shortenHandler := customHttp.NewShortenHandler(urlShortenerUseCase)
+	redirectHandler := customHttp.NewRedirectHandler(urlRedirecter)
 
-	http.HandleFunc("/shorten", handler.ShortenURL)
+	http.HandleFunc("/shorten", shortenHandler.ShortenURL)
+	http.HandleFunc("/redirect", redirectHandler.RedirectURL)
 }
