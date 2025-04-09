@@ -1,0 +1,3 @@
+#!/bin/sh
+# Ejecuta el binario principal de la aplicación
+exec /main "$@"

@@ -2,35 +2,34 @@ package persistence
 
 import (
 	"URL_shortener/Internal/domain"
+	"encoding/hex"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-	"log"
+	"math/rand"
 )
 
 type DynamoShorterRepository struct {
 	db *dynamodb.DynamoDB
 }
 
-func DynamoShorterRepositoryConstruct() *DynamoShorterRepository {
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String("eu-west-2"),
-	}))
-	db := dynamodb.New(sess)
+func DynamoShorterRepositoryConstruct(db *dynamodb.DynamoDB) *DynamoShorterRepository {
 	return &DynamoShorterRepository{db: db}
 }
 
 func (repo *DynamoShorterRepository) Shorten(url *domain.URL) (string, error) {
-	shortURL := generateShortURL(url.Id)
-	err := repo.SaveURLMapping(url.String(), shortURL)
+	shortCode := generateShortCode(url.Url)
+	shortURL := "http://short.url/" + shortCode
+
+	err := repo.saveURLMapping(url.Url, shortURL)
 	if err != nil {
 		return "", err
 	}
+
 	return shortURL, nil
 }
 
-func (repo *DynamoShorterRepository) SaveURLMapping(originalURL, shortURL string) error {
+func (repo *DynamoShorterRepository) saveURLMapping(originalURL, shortURL string) error {
 	item := domain.URLMapping{
 		OriginalURL: originalURL,
 		ShortURL:    shortURL,
@@ -38,7 +37,6 @@ func (repo *DynamoShorterRepository) SaveURLMapping(originalURL, shortURL string
 
 	av, err := dynamodbattribute.MarshalMap(item)
 	if err != nil {
-		log.Fatalf("Got error marshalling map: %s", err)
 		return err
 	}
 
@@ -48,14 +46,21 @@ func (repo *DynamoShorterRepository) SaveURLMapping(originalURL, shortURL string
 	}
 
 	_, err = repo.db.PutItem(input)
-	if err != nil {
-		log.Fatalf("Got error calling PutItem: %s", err)
-		return err
-	}
-
-	return nil
+	return err
 }
 
-func generateShortURL(id string) string {
-	return "http://short.url/" + id
+func generateShortCode(url string) string {
+	uniqueID, err := generateUniqueId()
+	if err != nil {
+		return ""
+	}
+	return uniqueID[:8]
+}
+
+func generateUniqueId() (string, error) {
+	bytes := make([]byte, 16)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
 }
