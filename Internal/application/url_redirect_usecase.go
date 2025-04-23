@@ -14,7 +14,7 @@ func NewRedirectHandlerUseCase(urlRedirecter interfaces.URLRedirecter) *Redirect
 }
 
 func (u *RedirectHandlerUseCase) RedirectURL(shortURL string) (string, error) {
-	myUrl, _ := domain.NewURL(shortURL)
+	myUrl, _ := domain.NewURL("http://short.url/" + shortURL)
 	originalURL, err := u.urlRedirecter.Redirect(myUrl)
 	if err != nil {
 		return "", err

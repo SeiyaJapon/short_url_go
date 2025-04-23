@@ -1,0 +1,67 @@
+# Binarios compilados para diferentes plataformas
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Archivos binarios del proyecto
+bin/
+cmd/URL_shortener
+URL_shortener
+
+# Test binaries
+*.test
+
+# Output de herramientas de cobertura
+*.out
+*.prof
+coverage.html
+
+# Archivos de dependencias
+vendor/
+
+# Archivos temporales de Go
+/tmp/
+
+# Archivos de configuración y logs
+*.env
+*.log
+.env
+.env.local
+config.local.yaml
+
+# Archivos de caché de Go
+.cache/
+
+# Archivos IDE y editores
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Archivos específicos de bases de datos
+*.db
+*.sqlite
+
+# Directorios de salida de construcción
+build/
+dist/
+out/
+
+# Archivo de bloqueo de dependencias (se puede descomentar si se quiere incluir en el repositorio)
+# go.sum
+
+# Archivos de credenciales
+credentials.json
+*_credentials.json
+
+# Certificados
+*.pem
+*.cert
+*.key
+
+# Directorios específicos del sistema
+node_modules/

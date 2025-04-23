@@ -1,22 +1,18 @@
 package main
 
 import (
-	"URL_shortener/Internal/application"
-	"URL_shortener/Internal/domain/interfaces"
-	customHttp "URL_shortener/Internal/infrastructure/http"
-	"URL_shortener/Internal/infrastructure/persistence"
-	"net/http"
+	http "URL_shortener/Internal/infrastructure"
+	"log"
 )
 
 func main() {
-	var urlShorterRepository interfaces.URLShorter = persistence.DynamoShorterRepositoryConstruct()
-	var urlRedirecterRepository interfaces.URLRedirecter = '' // TODO: Implement the repository
-	var urlShortenerUseCase = *application.NewURLShortenerUseCase(urlShorterRepository)
-	var urlRedirecter = *application.NewRedirectHandlerUseCase(urlRedirecterRepository)
+	server, err := http.NewServer()
+	if err != nil {
+		log.Fatalf("failed to initialize server: %v", err)
+	}
 
-	shortenHandler := customHttp.NewShortenHandler(urlShortenerUseCase)
-	redirectHandler := customHttp.NewRedirectHandler(urlRedirecter)
-
-	http.HandleFunc("/shorten", shortenHandler.ShortenURL)
-	http.HandleFunc("/redirect", redirectHandler.RedirectURL)
+	log.Println("Server started on :8080")
+	if err := server.ListenAndServe(); err != nil {
+		log.Fatalf("server error: %v", err)
+	}
 }

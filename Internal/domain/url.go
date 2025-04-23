@@ -14,7 +14,7 @@ func NewURL(value string) (*URL, error) {
 	if !isValidURL(value) {
 		return nil, errors.New("invalid url")
 	}
-	return &URL{Id: value}, nil
+	return &URL{Url: value}, nil
 }
 
 func isValidURL(value string) bool {
@@ -23,5 +23,8 @@ func isValidURL(value string) bool {
 }
 
 func (u *URL) String() string {
+	if u == nil {
+		return ""
+	}
 	return u.Url
 }
